@@ -97,6 +97,7 @@ public enum DocumentLoader {
     /// reading source code one word at a time is no use to anyone.
     public static func stripMarkdown(_ markdown: String) -> String {
         var s = markdown.replacingOccurrences(of: "\r\n", with: "\n")
+        s = expandWikiLinks(s)
         s = replacing(in: s, pattern: "(?ms)^[ \t]*(```|~~~).*?^[ \t]*\\1[ \t]*$", with: "")
         s = replacing(in: s, pattern: "(?m)^[ \t]{0,3}#{1,6}[ \t]+", with: "")
         s = replacing(in: s, pattern: "(?m)^[ \t]{0,3}>[ \t]?", with: "")
@@ -112,6 +113,38 @@ public enum DocumentLoader {
         s = replacing(in: s, pattern: "<[^>\n]+>", with: "")
         s = replacing(in: s, pattern: "\n{3,}", with: "\n\n")
         return s
+    }
+
+    /// Obsidian-style `[[wiki links]]`. The folders and hyphens in a link are
+    /// addressing, not prose, so `[[Personal/Direction/one-page-direction]]` reads
+    /// as "one page direction" rather than arriving as one 40-character word.
+    public static func expandWikiLinks(_ s: String) -> String {
+        guard let re = try? NSRegularExpression(pattern: "\\[\\[([^\\]]+)\\]\\]") else { return s }
+        let ns = s as NSString
+        var result = ""
+        var consumed = 0
+
+        for match in re.matches(in: s, range: NSRange(location: 0, length: ns.length)) {
+            result += ns.substring(with: NSRange(location: consumed, length: match.range.location - consumed))
+            var inner = ns.substring(with: match.range(at: 1))
+
+            if let bar = inner.lastIndex(of: "|") {
+                // [[target|what to display]] — the author already wrote the readable half.
+                inner = String(inner[inner.index(after: bar)...])
+            } else {
+                if let hash = inner.firstIndex(of: "#") { inner = String(inner[..<hash]) }
+                inner = inner.split(separator: "/").last.map(String.init) ?? inner
+                inner = inner
+                    .replacingOccurrences(of: "-", with: " ")
+                    .replacingOccurrences(of: "_", with: " ")
+            }
+
+            result += inner.trimmingCharacters(in: .whitespaces)
+            consumed = match.range.location + match.range.length
+        }
+
+        result += ns.substring(from: consumed)
+        return result
     }
 
     static func replacing(in s: String, pattern: String, with template: String) -> String {

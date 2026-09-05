@@ -96,6 +96,27 @@ public enum Tokenizer {
 
     // MARK: - Tokenizing
 
+    static let joiningDashes: Set<Character> = ["\u{2014}", "\u{2013}"]
+
+    /// A dash written without spaces around it — "words\u{2014}one at a time" — makes two
+    /// words look like one long one. Split there, keeping the dash on the left half so
+    /// it still reads as a pause.
+    public static func splitOnDashes(_ word: String) -> [String] {
+        guard word.contains(where: { joiningDashes.contains($0) }) else { return [word] }
+
+        var parts: [String] = []
+        var current = ""
+        for character in word {
+            current.append(character)
+            if joiningDashes.contains(character), current.contains(where: { $0.isLetter || $0.isNumber }) {
+                parts.append(current)
+                current = ""
+            }
+        }
+        if !current.isEmpty { parts.append(current) }
+        return parts.isEmpty ? [word] : parts
+    }
+
     /// Splits plain text into display-ready tokens, preserving paragraph boundaries.
     public static func tokenize(_ text: String) -> [Token] {
         var tokens: [Token] = []
@@ -106,7 +127,9 @@ public enum Tokenizer {
             .map { $0.joined(separator: " ") }
 
         for paragraph in paragraphs {
-            let words = paragraph.split(whereSeparator: { $0.isWhitespace }).map(String.init)
+            let words = paragraph
+                .split(whereSeparator: { $0.isWhitespace })
+                .flatMap { splitOnDashes(String($0)) }
             for (i, word) in words.enumerated() {
                 let isParagraphEnd = (i == words.count - 1)
                 tokens.append(Token(

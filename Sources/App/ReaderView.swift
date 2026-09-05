@@ -18,7 +18,12 @@ struct ReaderView: View {
                 }
 
                 if let chunk = engine.current {
-                    PivotWordView(text: chunk.text, pivotIndex: chunk.pivotIndex, fontSize: fontSize)
+                    PivotWordView(
+                        text: chunk.text,
+                        pivotIndex: chunk.pivotIndex,
+                        fontSize: fontSize,
+                        availableWidth: geo.size.width
+                    )
                 }
 
                 if engine.isFinished {

@@ -8,6 +8,7 @@ Task { @MainActor in
         pacingSuite(),
         tokenizeSuite(),
         chunkerSuite(),
+        layoutSuite(),
         markdownSuite(),
         reflowSuite(),
         loadSuite(),

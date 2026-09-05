@@ -43,6 +43,22 @@ func markdownSuite() -> Suite {
         try expectContains(DocumentLoader.stripMarkdown("Run `swift build` first."), "Run swift build first.")
     }
 
+    s.test("a wiki link reads as words, not as a path") {
+        let out = DocumentLoader.stripMarkdown("See [[Personal/Direction/one-page-direction]] for more.")
+        try expectContains(out, "See one page direction for more.")
+        try expectNotContains(out, "[[")
+        try expectNotContains(out, "Personal/")
+    }
+
+    s.test("a wiki link with its own label keeps the label") {
+        let out = DocumentLoader.stripMarkdown("Check [[research/q4-q6-solo-ai|the solo AI notes]] later.")
+        try expectContains(out, "Check the solo AI notes later.")
+    }
+
+    s.test("a wiki link pointing at a heading drops the heading") {
+        try expectContains(DocumentLoader.stripMarkdown("[[my-note#Some Heading]]"), "my note")
+    }
+
     s.test("underscores inside a word survive") {
         try expectContains(DocumentLoader.stripMarkdown("The value_of_this stays intact."), "value_of_this")
     }

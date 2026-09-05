@@ -88,6 +88,17 @@ func tokenizeSuite() -> Suite {
         try expect(tokens[2].isParagraphEnd)
     }
 
+    s.test("a dash with no spaces around it separates two words") {
+        let tokens = Tokenizer.tokenize("eyes\u{2014}not the brain\u{2014}set the limit")
+        try expectEqual(tokens.map(\.text).prefix(2).map { $0 }, ["eyes\u{2014}", "not"])
+        try expect(tokens.allSatisfy { $0.text.count < 12 })
+    }
+
+    s.test("a lone dash is left alone") {
+        try expectEqual(Tokenizer.splitOnDashes("\u{2014}"), ["\u{2014}"])
+        try expectEqual(Tokenizer.splitOnDashes("plain"), ["plain"])
+    }
+
     s.test("blank text produces no tokens") {
         try expect(Tokenizer.tokenize("   \n\n  ").isEmpty)
     }
