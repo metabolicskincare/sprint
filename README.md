@@ -7,15 +7,33 @@ screen — a technique called rapid serial visual presentation.
 The idea is that ordinary reading spends most of its time moving your eyes
 rather than recognising words. Take the movement away and the ceiling goes up.
 
-## Running it
+## Installing it
+
+Download the latest `Sprint.app.zip` from the
+[releases page](../../releases), unzip it, and drag Sprint to your
+Applications folder.
+
+**The first time you open it, macOS will refuse.** Sprint isn't signed with a
+paid Apple Developer certificate, so macOS shows a warning about an
+unidentified developer. To get past it, **right-click the app and choose
+Open**, then click Open in the dialog. You only have to do this once — after
+that it launches normally.
+
+Requires macOS 14 (Sonoma) or later.
+
+## Building it yourself
 
 ```bash
 ./build.sh
 open dist/Sprint.app
 ```
 
-The first build takes a few minutes because the compiler has to process the
-system frameworks; later builds take seconds.
+No Xcode project, no package manager, no dependencies — the Command Line Tools
+are enough. The first build takes a few minutes because the compiler has to
+process the system frameworks; later builds take seconds.
+
+Note that the app doesn't pick up a rebuild while it's running. Quit it and
+reopen it after making changes.
 
 ## Using it
 
@@ -71,16 +89,21 @@ seeking and timing behaviour.
 
 ## About the build scripts
 
-There's no Xcode project and no Swift package here. This machine has the Command
-Line Tools rather than full Xcode, and that install has two problems: its
-SwiftPM manifest library doesn't match its own headers, so `swift build` can't
-read a `Package.swift` at all, and a leftover file from a 2023 install breaks
-every `import Foundation`.
+There's no Xcode project and no Swift package here. `build.sh` calls the
+compiler directly and assembles the result into an app bundle, which keeps the
+whole thing to three shell scripts and some Swift.
 
-`build.sh` sidesteps both. It calls the compiler directly and hides the stale
-file behind an empty one for the duration of the build. `toolchain.sh` has the
-details, and the workaround switches itself off automatically if the Command
-Line Tools are ever reinstalled.
+`toolchain.sh` also carries a workaround for a specific broken Command Line
+Tools install, where a leftover file from an older version declares a module
+twice and breaks every `import Foundation`. If your machine isn't affected the
+workaround switches itself off, so it costs you nothing.
+
+## Why it isn't signed
+
+Signing and notarising a Mac app requires an Apple Developer account at $99 a
+year. This is a small free tool, so it ships unsigned and you get the one-time
+right-click dance described above. The source is all here if you'd rather build
+it yourself and skip that.
 
 ## Layout
 
