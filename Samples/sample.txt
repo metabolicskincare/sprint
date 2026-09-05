@@ -1,0 +1,7 @@
+Plain text works exactly the same way as Markdown, minus the formatting. Drop a
+transcript, an article you saved, or a chapter you pasted into a file, and it
+reads identically.
+
+Line wrapping inside a paragraph is ignored, so text that was hard-wrapped at
+eighty columns still flows as one continuous paragraph. Only a blank line
+counts as a real break.
