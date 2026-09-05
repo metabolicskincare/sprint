@@ -9,9 +9,11 @@ rather than recognising words. Take the movement away and the ceiling goes up.
 
 ## Installing it
 
-Download the latest `Sprint.app.zip` from the
-[releases page](../../releases), unzip it, and drag Sprint to your
-Applications folder.
+Download the latest `Sprint.zip` from the [releases page](../../releases) and
+unzip it. You get the app and a short guide called **Start Here.md**. Drag
+Sprint to your Applications folder, then open Start Here in it: the guide is
+written to be read in Sprint, and it walks you through the controls while you
+practise on it.
 
 **The first time you open it, macOS will refuse.** Sprint isn't signed with a
 paid Apple Developer certificate, so macOS shows a warning about an
@@ -112,5 +114,5 @@ Sources/Core/     Tokenizer, Chunker, DocumentLoader, ReaderEngine — no UI
 Sources/App/      SwiftUI views and the app entry point
 Tests/            A small test harness and the unit tests
 Resources/        Info.plist for the app bundle
-Samples/          Files to try it with
+Samples/          Start Here.md, which ships with the app, plus files to try
 ```
